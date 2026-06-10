@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>사주타로 라이트 — 무료 기본 사주풀이</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #0d0d1a; color: #e2e8f0; font-family: 'Noto Sans KR', sans-serif; }
+    .pillar-card { background: #1a1a2e; border: 1px solid #2d2d4e; border-radius: 14px; }
+    .oh-bar { height: 8px; border-radius: 4px; background: #2d2d4e; }
+    .oh-fill { height: 8px; border-radius: 4px; }
+    .input-field { background: #1a1a2e; border: 1px solid #2d2d4e; border-radius: 10px;
+                   padding: 10px 14px; width: 100%; color: #e2e8f0; }
+    .input-field:focus { outline: none; border-color: #a78bfa; }
+    select.input-field option { background: #1a1a2e; }
+    .btn-primary { background: #7c3aed; border-radius: 14px; padding: 14px;
+                   font-weight: 700; cursor: pointer; transition: background .2s; }
+    .btn-primary:hover { background: #6d28d9; }
+    .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div class="max-w-lg mx-auto px-4 py-10" id="app">
+
+    <!-- 헤더 -->
+    <div class="text-center mb-8">
+      <div class="text-5xl mb-3">☯</div>
+      <h1 class="text-3xl font-bold text-purple-400 mb-1">사주타로 라이트</h1>
+      <p class="text-sm text-gray-500">무료 기본 사주풀이 · AI 해석 없이 만세력만 제공</p>
+      <a href="https://taehyun1121.github.io/saju-tarot-site/" target="_blank"
+         class="text-xs text-purple-500 underline mt-1 inline-block">
+        ✨ 타로 + AI 해석이 포함된 프로 버전 →
+      </a>
+    </div>
+
+    <!-- 입력 폼 -->
+    <div id="form-section" class="space-y-4">
+      <div class="pillar-card p-5">
+        <h2 class="text-sm text-gray-500 mb-4 tracking-widest">생년월일 입력</h2>
+
+        <div class="grid grid-cols-3 gap-3 mb-4">
+          <div>
+            <label class="text-xs text-gray-500 block mb-1">년 (Year)</label>
+            <select id="sel-year" class="input-field">
+              <option value="">년도</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-gray-500 block mb-1">월 (Month)</label>
+            <select id="sel-month" class="input-field">
+              <option value="">월</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-gray-500 block mb-1">일 (Day)</label>
+            <select id="sel-day" class="input-field">
+              <option value="">일</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="text-xs text-gray-500 block mb-1">태어난 시간 (모르면 체크)</label>
+          <div class="flex gap-3 items-center">
+            <select id="sel-hour" class="input-field flex-1">
+              <option value="">시간 선택</option>
+            </select>
+            <label class="flex items-center gap-2 text-sm text-gray-400 whitespace-nowrap cursor-pointer">
+              <input type="checkbox" id="hour-unknown" class="accent-purple-500" />
+              모름
+            </label>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="text-xs text-gray-500 block mb-1">성별</label>
+          <div class="flex gap-3">
+            <button onclick="setGender('male')" id="btn-male"
+              class="flex-1 py-2 rounded-xl border border-gray-700 text-sm transition-colors">남성</button>
+            <button onclick="setGender('female')" id="btn-female"
+              class="flex-1 py-2 rounded-xl border border-gray-700 text-sm transition-colors">여성</button>
+          </div>
+        </div>
+
+        <button id="btn-calc" onclick="calculate()" disabled
+          class="btn-primary w-full text-white">
+          사주 계산하기 →
+        </button>
+      </div>
+    </div>
+
+    <!-- 결과 -->
+    <div id="result-section" class="hidden space-y-4 mt-4">
+      <div class="pillar-card p-5">
+        <h2 class="text-xs text-gray-500 tracking-widest mb-4">사주 원국 (四柱)</h2>
+        <div class="grid grid-cols-4 gap-2" id="pillars-grid"></div>
+      </div>
+
+      <div class="pillar-card p-5">
+        <h2 class="text-xs text-gray-500 tracking-widest mb-4">오행 분포 (五行)</h2>
+        <div id="ohaeng-bars" class="space-y-3"></div>
+        <div id="lacking-box" class="mt-4 hidden">
+          <p class="text-xs text-gray-500 mb-2">부족한 오행</p>
+          <div id="lacking-list" class="flex gap-2 flex-wrap"></div>
+        </div>
+      </div>
+
+      <div class="pillar-card p-5">
+        <h2 class="text-xs text-gray-500 tracking-widest mb-3">간단 해석</h2>
+        <p id="ilgan-desc" class="text-sm text-gray-300 leading-relaxed"></p>
+      </div>
+
+      <button onclick="reset()"
+        class="w-full py-3 text-sm text-gray-500 border border-gray-700 rounded-xl hover:border-purple-600 hover:text-purple-400 transition-colors">
+        ← 다시 입력
+      </button>
+
+      <div class="text-center py-2">
+        <a href="https://taehyun1121.github.io/saju-tarot-site/" target="_blank"
+           class="text-purple-400 text-sm">타로 해석 + AI 사주풀이 → 프로 버전에서 보기</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="saju.js"></script>
+  <script>
+    // 셀렉트 초기화
+    const yearSel = document.getElementById('sel-year');
+    const monthSel = document.getElementById('sel-month');
+    const daySel = document.getElementById('sel-day');
+    const hourSel = document.getElementById('sel-hour');
+
+    for (let y = 2010; y >= 1920; y--) {
+      const o = document.createElement('option'); o.value = y; o.textContent = `${y}년`;
+      yearSel.appendChild(o);
+    }
+    for (let m = 1; m <= 12; m++) {
+      const o = document.createElement('option'); o.value = m; o.textContent = `${m}월`;
+      monthSel.appendChild(o);
+    }
+    for (let d = 1; d <= 31; d++) {
+      const o = document.createElement('option'); o.value = d; o.textContent = `${d}일`;
+      daySel.appendChild(o);
+    }
+    for (let h = 0; h <= 23; h++) {
+      const o = document.createElement('option'); o.value = h; o.textContent = `${h}시`;
+      hourSel.appendChild(o);
+    }
+
+    let gender = null;
+    function setGender(g) {
+      gender = g;
+      document.getElementById('btn-male').className =
+        'flex-1 py-2 rounded-xl border text-sm transition-colors ' +
+        (g === 'male' ? 'border-purple-500 text-purple-400 bg-purple-900/30' : 'border-gray-700 text-gray-400');
+      document.getElementById('btn-female').className =
+        'flex-1 py-2 rounded-xl border text-sm transition-colors ' +
+        (g === 'female' ? 'border-purple-500 text-purple-400 bg-purple-900/30' : 'border-gray-700 text-gray-400');
+      validate();
+    }
+
+    document.getElementById('hour-unknown').addEventListener('change', function() {
+      hourSel.disabled = this.checked;
+      validate();
+    });
+
+    ['sel-year','sel-month','sel-day','sel-hour'].forEach(id => {
+      document.getElementById(id).addEventListener('change', validate);
+    });
+
+    function validate() {
+      const y = yearSel.value, m = monthSel.value, d = daySel.value;
+      const hourOk = document.getElementById('hour-unknown').checked || hourSel.value !== '';
+      document.getElementById('btn-calc').disabled = !(y && m && d && gender && hourOk);
+    }
+
+    function calculate() {
+      const year = +yearSel.value, month = +monthSel.value, day = +daySel.value;
+      const hourUnknown = document.getElementById('hour-unknown').checked;
+      const hour = hourUnknown ? null : +hourSel.value;
+
+      const result = calcAllPillars(year, month, day, hour);
+
+      // 기둥 렌더
+      const labels = ['년주','월주','일주','시주'];
+      const keys = ['yeonju','wolju','ilju','siju'];
+      const grid = document.getElementById('pillars-grid');
+      grid.innerHTML = '';
+      keys.forEach((k, i) => {
+        const p = result.pillars[k];
+        const top = p ? p.gan : '-';
+        const bot = p ? p.ji : (k === 'siju' ? '시간 모름' : '-');
+        grid.innerHTML += `
+          <div class="pillar-card p-3 text-center">
+            <div class="text-xs text-gray-500 mb-2">${labels[i]}</div>
+            <div class="text-2xl font-bold text-purple-400 mb-1">${top}</div>
+            <div class="w-full border-t border-gray-700 mb-1"></div>
+            <div class="text-xl font-semibold text-purple-300">${bot}</div>
+          </div>`;
+      });
+
+      // 오행 바
+      const OH_COLOR = {'木':'#4ade80','火':'#f87171','土':'#fbbf24','金':'#c0c8d4','水':'#60a5fa'};
+      const OH_NAME  = {'木':'목','火':'화','土':'토','金':'금','水':'수'};
+      const ohaeng = result.ohaeng;
+      const total = Object.values(ohaeng.counts).reduce((a,b)=>a+b,0) || 1;
+      const bars = document.getElementById('ohaeng-bars');
+      bars.innerHTML = '';
+      ['木','火','土','金','水'].forEach(oh => {
+        const cnt = ohaeng.counts[oh] || 0;
+        const pct = Math.round(cnt/total*100);
+        bars.innerHTML += `
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-bold w-6 text-center" style="color:${OH_COLOR[oh]}">${OH_NAME[oh]}</span>
+            <div class="oh-bar flex-1"><div class="oh-fill" style="width:${pct}%;background:${OH_COLOR[oh]}"></div></div>
+            <span class="text-xs text-gray-400 w-4 text-right">${cnt}</span>
+          </div>`;
+      });
+
+      // 부족한 오행
+      const lackBox = document.getElementById('lacking-box');
+      const lackList = document.getElementById('lacking-list');
+      if (ohaeng.lacking.length > 0) {
+        lackBox.classList.remove('hidden');
+        lackList.innerHTML = ohaeng.lacking.map(oh =>
+          `<span class="px-3 py-1 rounded-full text-xs font-bold border" style="color:${OH_COLOR[oh]};border-color:${OH_COLOR[oh]}">${oh}</span>`
+        ).join('');
+      } else {
+        lackBox.classList.add('hidden');
+      }
+
+      // 일간 해석
+      const desc = ILGAN_DESC[result.pillars.ilju?.gan] || '일간 정보를 확인하세요.';
+      document.getElementById('ilgan-desc').textContent = desc;
+
+      document.getElementById('form-section').classList.add('hidden');
+      document.getElementById('result-section').classList.remove('hidden');
+    }
+
+    function reset() {
+      document.getElementById('form-section').classList.remove('hidden');
+      document.getElementById('result-section').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
