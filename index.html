@@ -6,16 +6,16 @@
   <title>사주타로 라이트 — 무료 기본 사주풀이</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background: #0d0d1a; color: #e2e8f0; font-family: 'Noto Sans KR', sans-serif; }
-    .pillar-card { background: #1a1a2e; border: 1px solid #2d2d4e; border-radius: 14px; }
-    .oh-bar { height: 8px; border-radius: 4px; background: #2d2d4e; }
+    body { background: #f8f7ff; color: #1e1b4b; font-family: 'Noto Sans KR', sans-serif; }
+    .pillar-card { background: #ffffff; border: 1px solid #e5e0ff; border-radius: 14px; box-shadow: 0 1px 6px rgba(124,58,237,.08); }
+    .oh-bar { height: 8px; border-radius: 4px; background: #ede9fe; }
     .oh-fill { height: 8px; border-radius: 4px; }
-    .input-field { background: #1a1a2e; border: 1px solid #2d2d4e; border-radius: 10px;
-                   padding: 10px 14px; width: 100%; color: #e2e8f0; }
-    .input-field:focus { outline: none; border-color: #a78bfa; }
-    select.input-field option { background: #1a1a2e; }
+    .input-field { background: #ffffff; border: 1px solid #d8d0ff; border-radius: 10px;
+                   padding: 10px 14px; width: 100%; color: #1e1b4b; }
+    .input-field:focus { outline: none; border-color: #7c3aed; }
+    select.input-field option { background: #ffffff; color: #1e1b4b; }
     .btn-primary { background: #7c3aed; border-radius: 14px; padding: 14px;
-                   font-weight: 700; cursor: pointer; transition: background .2s; }
+                   font-weight: 700; cursor: pointer; transition: background .2s; color: #ffffff; }
     .btn-primary:hover { background: #6d28d9; }
     .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
   </style>
@@ -26,10 +26,10 @@
     <!-- 헤더 -->
     <div class="text-center mb-8">
       <div class="text-5xl mb-3">☯</div>
-      <h1 class="text-3xl font-bold text-purple-400 mb-1">사주타로 라이트</h1>
+      <h1 class="text-3xl font-bold text-purple-700 mb-1">사주타로 라이트</h1>
       <p class="text-sm text-gray-500">무료 기본 사주풀이 · AI 해석 없이 만세력만 제공</p>
       <a href="https://taehyun1121.github.io/saju-tarot-site/" target="_blank"
-         class="text-xs text-purple-500 underline mt-1 inline-block">
+         class="text-xs text-purple-600 underline mt-1 inline-block">
         ✨ 타로 + AI 해석이 포함된 프로 버전 →
       </a>
     </div>
@@ -80,9 +80,9 @@
           <label class="text-xs text-gray-500 block mb-1">성별</label>
           <div class="flex gap-3">
             <button onclick="setGender('male')" id="btn-male"
-              class="flex-1 py-2 rounded-xl border border-gray-700 text-sm transition-colors">남성</button>
+              class="flex-1 py-2 rounded-xl border border-violet-200 text-sm transition-colors">남성</button>
             <button onclick="setGender('female')" id="btn-female"
-              class="flex-1 py-2 rounded-xl border border-gray-700 text-sm transition-colors">여성</button>
+              class="flex-1 py-2 rounded-xl border border-violet-200 text-sm transition-colors">여성</button>
           </div>
         </div>
 
@@ -111,17 +111,17 @@
 
       <div class="pillar-card p-5">
         <h2 class="text-xs text-gray-500 tracking-widest mb-3">간단 해석</h2>
-        <p id="ilgan-desc" class="text-sm text-gray-300 leading-relaxed"></p>
+        <p id="ilgan-desc" class="text-sm text-gray-600 leading-relaxed"></p>
       </div>
 
       <button onclick="reset()"
-        class="w-full py-3 text-sm text-gray-500 border border-gray-700 rounded-xl hover:border-purple-600 hover:text-purple-400 transition-colors">
+        class="w-full py-3 text-sm text-gray-500 border border-violet-200 rounded-xl hover:border-purple-500 hover:text-purple-700 transition-colors">
         ← 다시 입력
       </button>
 
       <div class="text-center py-2">
         <a href="https://taehyun1121.github.io/saju-tarot-site/" target="_blank"
-           class="text-purple-400 text-sm">타로 해석 + AI 사주풀이 → 프로 버전에서 보기</a>
+           class="text-purple-700 text-sm">타로 해석 + AI 사주풀이 → 프로 버전에서 보기</a>
       </div>
     </div>
   </div>
@@ -162,10 +162,10 @@
       gender = g;
       document.getElementById('btn-male').className =
         'flex-1 py-2 rounded-xl border text-sm transition-colors ' +
-        (g === 'male' ? 'border-purple-500 text-purple-400 bg-purple-900/30' : 'border-gray-700 text-gray-400');
+        (g === 'male' ? 'border-purple-500 text-purple-700 bg-purple-100' : 'border-violet-200 text-gray-400');
       document.getElementById('btn-female').className =
         'flex-1 py-2 rounded-xl border text-sm transition-colors ' +
-        (g === 'female' ? 'border-purple-500 text-purple-400 bg-purple-900/30' : 'border-gray-700 text-gray-400');
+        (g === 'female' ? 'border-purple-500 text-purple-700 bg-purple-100' : 'border-violet-200 text-gray-400');
       validate();
     }
 
@@ -205,8 +205,8 @@
         grid.innerHTML += `
           <div class="pillar-card p-3 text-center">
             <div class="text-xs text-gray-500 mb-2">${labels[i]}</div>
-            <div class="text-2xl font-bold text-purple-400 mb-1">${top}</div>
-            <div class="w-full border-t border-gray-700 mb-1"></div>
+            <div class="text-2xl font-bold text-purple-700 mb-1">${top}</div>
+            <div class="w-full border-t border-violet-200 mb-1"></div>
             <div class="text-xl font-semibold text-purple-300">${bot}</div>
           </div>`;
       });
