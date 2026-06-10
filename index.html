@@ -62,7 +62,7 @@
     <p style="font-size:13px;color:var(--text-sub);">운명을 읽는 시간</p>
     <a href="https://taehyun1121.github.io/saju-tarot-site/" target="_blank"
        style="font-size:11px;color:var(--focus);text-decoration:underline;margin-top:4px;display:inline-block;">
-      ✨ AI 타로 해석 포함 프로 버전 →
+      ✨ AI 해석 포함 프로 버전 →
     </a>
   </div>
 
@@ -79,7 +79,7 @@
     </div>
     <div class="step-tab inactive" id="step3-tab">
       <div style="font-size:16px;font-weight:800;margin-bottom:1px;">3</div>
-      <div style="font-size:10px;">다시보기</div>
+      <div style="font-size:10px;">타로리딩</div>
     </div>
   </div>
 
@@ -156,10 +156,42 @@
 
     <div style="display:flex;gap:10px;margin-top:4px;">
       <button class="btn-sec" style="flex:1;" onclick="goStep(1)">← 다시 입력</button>
-      <a href="https://taehyun1121.github.io/saju-tarot-site/" target="_blank"
-         style="flex:1;display:block;">
-        <button class="btn-cta" style="width:100%;">🃏 타로 리딩</button>
-      </a>
+      <button class="btn-cta" style="flex:1;" onclick="goTarot()">🃏 타로 리딩</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: 타로 ── -->
+  <div id="step3" style="display:none;">
+    <div class="divider-label">오늘의 타로</div>
+    <div class="card" style="text-align:center;">
+      <p style="font-size:13px;color:var(--text-sub);margin-bottom:16px;">
+        질문을 마음속에 담고 카드를 뽑아보세요
+      </p>
+      <div id="tarot-question-area">
+        <textarea id="tarot-question" class="input-f" rows="2"
+          placeholder="예: 지금 나의 연애운은? 직장 이동이 좋을까요?"
+          style="resize:none;margin-bottom:12px;"></textarea>
+        <div style="display:flex;gap:8px;margin-bottom:16px;justify-content:center;">
+          <button class="btn-sec" style="padding:8px 16px;font-size:12px;" onclick="setSpread(1)">1장</button>
+          <button class="btn-sec" style="padding:8px 16px;font-size:12px;" onclick="setSpread(3)">3장</button>
+        </div>
+        <button id="btn-draw" class="btn-cta" style="width:100%;" onclick="drawCards()">✨ 카드 뽑기</button>
+      </div>
+    </div>
+
+    <div id="tarot-result" style="display:none;">
+      <div class="divider-label">카드 해석</div>
+      <div id="tarot-cards" style="display:flex;flex-direction:column;gap:12px;"></div>
+      <div style="margin-top:12px;padding:14px;background:#fff8f0;border:1px solid var(--border);
+                  border-radius:12px;font-size:12px;color:var(--text-sub);text-align:center;">
+        AI 해석 + 사주 연계 분석은
+        <a href="https://taehyun1121.github.io/saju-tarot-site/" target="_blank"
+           style="color:var(--focus);font-weight:700;">프로 버전</a>에서 제공됩니다
+      </div>
+      <div style="display:flex;gap:10px;margin-top:12px;">
+        <button class="btn-sec" style="flex:1;" onclick="resetTarot()">다시 뽑기</button>
+        <button class="btn-sec" style="flex:1;" onclick="goStep(2)">← 사주풀이</button>
+      </div>
     </div>
   </div>
 
@@ -229,6 +261,7 @@
   function goStep(n) {
     document.getElementById('step1').style.display = n === 1 ? '' : 'none';
     document.getElementById('step2').style.display = n === 2 ? '' : 'none';
+    document.getElementById('step3').style.display = n === 3 ? '' : 'none';
     ['step1-tab','step2-tab','step3-tab'].forEach((id, i) => {
       const el = document.getElementById(id);
       el.className = 'step-tab ' + (i + 1 === n ? 'active' : 'inactive');
@@ -297,6 +330,83 @@
     document.getElementById('ilgan-desc').textContent = ILGAN_DESC[result.pillars.ilju?.gan] || '';
 
     goStep(2);
+  }
+
+  // ── 타로 ──────────────────────────────────────────────
+  const TAROT_CARDS = [
+    { name:'바보', num:'0', emoji:'🌟', keyword:'새출발·용기·모험', up:'새로운 시작. 두려움 없이 나아갈 때입니다.', down:'무모한 도전. 준비 없는 행동은 위험합니다.' },
+    { name:'마법사', num:'I', emoji:'✨', keyword:'의지·창조·능력', up:'당신의 능력을 충분히 발휘하세요. 가능성이 열려 있습니다.', down:'의지력 부족. 재능을 낭비하고 있지 않나요?' },
+    { name:'여사제', num:'II', emoji:'🌙', keyword:'직관·신비·내면', up:'직관을 믿으세요. 숨겨진 진실이 드러납니다.', down:'비밀과 혼란. 감춰진 것에 주의하세요.' },
+    { name:'여황제', num:'III', emoji:'🌺', keyword:'풍요·모성·창조', up:'풍요와 성장의 시기. 사랑과 창조가 넘칩니다.', down:'의존성·나태함. 안주하지 마세요.' },
+    { name:'황제', num:'IV', emoji:'👑', keyword:'권위·안정·리더십', up:'강한 리더십으로 목표를 이루세요.', down:'독단·고집. 유연함이 필요합니다.' },
+    { name:'교황', num:'V', emoji:'⚖️', keyword:'전통·조언·신뢰', up:'신뢰할 수 있는 조언을 구하세요.', down:'편견·독단. 새로운 시각이 필요합니다.' },
+    { name:'연인', num:'VI', emoji:'💑', keyword:'선택·사랑·조화', up:'중요한 선택의 시기. 마음이 이끄는 대로 가세요.', down:'갈등·우유부단. 선택을 미루지 마세요.' },
+    { name:'전차', num:'VII', emoji:'🏆', keyword:'승리·의지·전진', up:'강한 의지로 장애물을 극복하세요. 승리가 눈앞입니다.', down:'과속·통제 불능. 속도를 줄이세요.' },
+    { name:'힘', num:'VIII', emoji:'🦁', keyword:'용기·인내·내면의 힘', up:'부드러운 힘으로 어려움을 극복하세요.', down:'의심·자신감 결여. 자신을 믿으세요.' },
+    { name:'은둔자', num:'IX', emoji:'🔦', keyword:'내면탐구·성찰·고독', up:'혼자만의 시간이 필요합니다. 내면을 들여다보세요.', down:'고립·외로움. 도움을 구하세요.' },
+    { name:'운명의 수레바퀴', num:'X', emoji:'🎡', keyword:'변화·운명·전환', up:'변화의 흐름을 타세요. 행운이 찾아옵니다.', down:'예상치 못한 변화. 유연하게 대응하세요.' },
+    { name:'정의', num:'XI', emoji:'⚖️', keyword:'공정·진실·균형', up:'공정한 결과가 따릅니다. 진실을 말하세요.', down:'불공평·편향. 모든 면을 살펴보세요.' },
+    { name:'매달린 사람', num:'XII', emoji:'🙃', keyword:'희생·수용·새로운 시각', up:'다른 관점으로 보면 해답이 보입니다.', down:'희생만 하고 있지 않나요? 자신을 돌보세요.' },
+    { name:'죽음', num:'XIII', emoji:'🦋', keyword:'변환·끝과 시작·전환', up:'낡은 것의 끝. 새로운 시작을 준비하세요.', down:'변화를 거부하고 있나요? 놓아주세요.' },
+    { name:'절제', num:'XIV', emoji:'🌊', keyword:'균형·인내·조화', up:'균형을 찾으세요. 인내가 최선입니다.', down:'과잉·불균형. 조율이 필요합니다.' },
+    { name:'악마', num:'XV', emoji:'⛓️', keyword:'집착·욕망·속박', up:'무엇에 묶여 있나요? 자유로워질 수 있습니다.', down:'해방의 시간. 속박에서 벗어나세요.' },
+    { name:'탑', num:'XVI', emoji:'⚡', keyword:'충격·붕괴·각성', up:'갑작스러운 변화가 오지만 성장의 기회입니다.', down:'충격 후 재건. 회복력을 믿으세요.' },
+    { name:'별', num:'XVII', emoji:'⭐', keyword:'희망·치유·영감', up:'희망을 잃지 마세요. 치유와 영감의 시간입니다.', down:'실망·자기 의심. 가능성을 믿으세요.' },
+    { name:'달', num:'XVIII', emoji:'🌕', keyword:'환상·불안·무의식', up:'감춰진 것들이 드러납니다. 직관을 따르세요.', down:'혼란·두려움. 현실을 직시하세요.' },
+    { name:'태양', num:'XIX', emoji:'☀️', keyword:'기쁨·성공·활력', up:'밝고 활기찬 에너지! 성공과 행복이 따릅니다.', down:'과도한 낙관. 현실적으로 접근하세요.' },
+    { name:'심판', num:'XX', emoji:'🎺', keyword:'각성·심판·부활', up:'새로운 소명에 귀를 기울이세요. 변화의 부름입니다.', down:'자책·망설임. 과거를 놓아주세요.' },
+    { name:'세계', num:'XXI', emoji:'🌍', keyword:'완성·성취·통합', up:'완성의 순간! 노력의 결실을 맺습니다.', down:'미완성·목표 재검토. 아직 갈 길이 있습니다.' },
+  ];
+
+  const SPREAD_LABELS = { 1: ['현재'], 3: ['과거','현재','미래'] };
+  let spreadCount = 1;
+
+  function setSpread(n) {
+    spreadCount = n;
+    document.querySelectorAll('#tarot-question-area .btn-sec').forEach((btn, i) => {
+      btn.style.fontWeight = ([1,3][i] === n) ? '800' : '500';
+      btn.style.borderColor = ([1,3][i] === n) ? 'var(--focus)' : 'var(--border)';
+      btn.style.color = ([1,3][i] === n) ? 'var(--focus)' : 'var(--text-sub)';
+    });
+  }
+
+  function drawCards() {
+    const deck = [...TAROT_CARDS].sort(() => Math.random() - 0.5);
+    const drawn = deck.slice(0, spreadCount).map(c => ({ ...c, reversed: Math.random() > 0.6 }));
+    const labels = SPREAD_LABELS[spreadCount];
+    const container = document.getElementById('tarot-cards');
+    container.innerHTML = '';
+    drawn.forEach((card, i) => {
+      const reading = card.reversed ? card.down : card.up;
+      container.innerHTML += `
+        <div class="card" style="border-left:4px solid var(--focus);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-size:28px;">${card.emoji}</span>
+            <div>
+              <div style="font-size:10px;color:var(--text-sub);letter-spacing:1px;">${labels[i] || ''}</div>
+              <div style="font-size:16px;font-weight:700;color:var(--step-active);">
+                ${card.name} ${card.reversed ? '(역방향)' : ''}
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);">${card.num} · ${card.keyword}</div>
+            </div>
+          </div>
+          <p style="font-size:13px;color:var(--text-sub);line-height:1.7;">${reading}</p>
+        </div>`;
+    });
+    document.getElementById('tarot-question-area').style.display = 'none';
+    document.getElementById('tarot-result').style.display = '';
+  }
+
+  function resetTarot() {
+    document.getElementById('tarot-question-area').style.display = '';
+    document.getElementById('tarot-result').style.display = 'none';
+    document.getElementById('tarot-cards').innerHTML = '';
+    setSpread(1);
+  }
+
+  function goTarot() {
+    resetTarot();
+    goStep(3);
   }
 </script>
 </body>
