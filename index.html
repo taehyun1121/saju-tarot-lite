@@ -1,258 +1,303 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>사주타로 라이트 — 무료 기본 사주풀이</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>사주타로 — 무료 사주풀이</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/suit@v1.0.3/packages/suit/dist/suit.min.css" rel="stylesheet">
   <style>
-    body { background: #f8f7ff; color: #1e1b4b; font-family: 'Noto Sans KR', sans-serif; }
-    .pillar-card { background: #ffffff; border: 1px solid #e5e0ff; border-radius: 14px; box-shadow: 0 1px 6px rgba(124,58,237,.08); }
-    .oh-bar { height: 8px; border-radius: 4px; background: #ede9fe; }
-    .oh-fill { height: 8px; border-radius: 4px; }
-    .input-field { background: #ffffff; border: 1px solid #d8d0ff; border-radius: 10px;
-                   padding: 10px 14px; width: 100%; color: #1e1b4b; }
-    .input-field:focus { outline: none; border-color: #7c3aed; }
-    select.input-field option { background: #ffffff; color: #1e1b4b; }
-    .btn-primary { background: #7c3aed; border-radius: 14px; padding: 14px;
-                   font-weight: 700; cursor: pointer; transition: background .2s; color: #ffffff; }
-    .btn-primary:hover { background: #6d28d9; }
-    .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+    :root {
+      --bg: #f0e8d8; --card: #faf5eb; --border: #d4b896;
+      --text: #3d1f0f; --text-sub: #8a6340; --text-muted: #a0856a;
+      --step-active: #6b2d14; --step-inactive: #c4a882;
+      --divider: #c4a882; --input-bg: #fffef5; --focus: #9b3a1c;
+    }
+    body { background:var(--bg); color:var(--text); font-family:'SUIT','Noto Sans KR',sans-serif; min-height:100vh; }
+    h1,h2,h3 { font-family:'Noto Serif KR',serif; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px;
+            box-shadow:0 2px 12px rgba(107,45,20,.08); margin-bottom:12px; }
+    .input-f { background:var(--input-bg); border:1px solid var(--border); border-radius:10px;
+               padding:10px 14px; width:100%; color:var(--text); font-size:14px; }
+    .input-f:focus { outline:none; border-color:var(--focus); }
+    select.input-f option { background:var(--input-bg); }
+    .btn-cta {
+      background: linear-gradient(135deg, #6b2d14 0%, #9b3a1c 60%, #8b2e18 100%);
+      color:#fff; border:none; border-radius:12px; padding:15px;
+      font-weight:700; font-size:15px; cursor:pointer;
+      box-shadow:0 4px 16px rgba(107,45,20,.4);
+      transition:all .2s; letter-spacing:.5px;
+      font-family:'Noto Serif KR',serif;
+    }
+    .btn-cta:hover { filter:brightness(1.1); transform:translateY(-1px); }
+    .btn-cta:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+    .btn-sec { background:var(--bg); color:var(--step-active);
+               border:1.5px solid var(--step-active); border-radius:12px; padding:14px;
+               font-weight:600; font-size:14px; cursor:pointer; transition:all .2s; }
+    .step-tab { flex:1; padding:10px 6px; text-align:center; border-radius:10px; transition:all .2s; }
+    .step-tab.active { background:var(--step-active); color:#fff; font-weight:700; }
+    .step-tab.inactive { background:transparent; color:var(--step-inactive); }
+    .divider-label { display:flex; align-items:center; gap:8px; margin:8px 0 12px; color:var(--text-sub); font-size:11px; letter-spacing:1px; }
+    .divider-label::before,.divider-label::after { content:''; flex:1; height:1px; background:var(--divider); }
+    .gender-btn { flex:1; padding:11px; border-radius:10px; border:1.5px solid var(--border);
+                  font-size:14px; font-weight:500; color:var(--text-sub); cursor:pointer;
+                  background:var(--input-bg); transition:all .2s; }
+    .gender-btn.on { border-color:var(--focus); color:var(--step-active); font-weight:700; background:#fff5ee; }
+    .oh-bar { height:8px; border-radius:4px; background:#ede0cc; }
+    .oh-fill { height:8px; border-radius:4px; }
+    .pillar-top { font-size:26px; font-weight:700; color:#6b2d14; }
+    .pillar-bot { font-size:22px; font-weight:600; color:#9b3a1c; }
   </style>
 </head>
-<body class="min-h-screen">
-  <div class="max-w-lg mx-auto px-4 py-10" id="app">
+<body>
+<div style="max-width:420px;margin:0 auto;padding:28px 18px 60px;" id="app">
 
-    <!-- 헤더 -->
-    <div class="text-center mb-8">
-      <div class="text-5xl mb-3">☯</div>
-      <h1 class="text-3xl font-bold text-purple-700 mb-1">사주타로 라이트</h1>
-      <p class="text-sm text-gray-500">무료 기본 사주풀이 · AI 해석 없이 만세력만 제공</p>
-      <a href="https://taehyun1121.github.io/saju-tarot-site/" target="_blank"
-         class="text-xs text-purple-600 underline mt-1 inline-block">
-        ✨ 타로 + AI 해석이 포함된 프로 버전 →
-      </a>
+  <!-- 헤더 -->
+  <div style="text-align:center;margin-bottom:24px;">
+    <div style="width:64px;height:64px;background:#6b2d14;border-radius:50%;
+                display:inline-flex;align-items:center;justify-content:center;
+                margin-bottom:12px;font-size:28px;box-shadow:0 4px 16px rgba(107,45,20,.3);">☯</div>
+    <h1 style="font-size:26px;font-weight:700;margin-bottom:4px;">사주타로</h1>
+    <p style="font-size:13px;color:var(--text-sub);">운명을 읽는 시간</p>
+    <a href="https://taehyun1121.github.io/saju-tarot-site/" target="_blank"
+       style="font-size:11px;color:var(--focus);text-decoration:underline;margin-top:4px;display:inline-block;">
+      ✨ AI 타로 해석 포함 프로 버전 →
+    </a>
+  </div>
+
+  <!-- 스텝 인디케이터 -->
+  <div style="display:flex;gap:6px;background:var(--card);border:1px solid var(--border);
+              border-radius:14px;padding:6px;margin-bottom:20px;">
+    <div class="step-tab active" id="step1-tab">
+      <div style="font-size:16px;font-weight:800;margin-bottom:1px;">1</div>
+      <div style="font-size:10px;">정보입력</div>
     </div>
-
-    <!-- 입력 폼 -->
-    <div id="form-section" class="space-y-4">
-      <div class="pillar-card p-5">
-        <h2 class="text-sm text-gray-500 mb-4 tracking-widest">생년월일 입력</h2>
-
-        <div class="grid grid-cols-3 gap-3 mb-4">
-          <div>
-            <label class="text-xs text-gray-500 block mb-1">년 (Year)</label>
-            <select id="sel-year" class="input-field">
-              <option value="">년도</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-xs text-gray-500 block mb-1">월 (Month)</label>
-            <select id="sel-month" class="input-field">
-              <option value="">월</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-xs text-gray-500 block mb-1">일 (Day)</label>
-            <select id="sel-day" class="input-field">
-              <option value="">일</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <label class="text-xs text-gray-500 block mb-1">태어난 시간 (모르면 체크)</label>
-          <div class="flex gap-2 items-center">
-            <select id="sel-hour" class="input-field flex-1">
-              <option value="">시</option>
-            </select>
-            <select id="sel-minute" class="input-field flex-1">
-              <option value="">분</option>
-            </select>
-            <label class="flex items-center gap-2 text-sm text-gray-400 whitespace-nowrap cursor-pointer">
-              <input type="checkbox" id="hour-unknown" class="accent-purple-500" />
-              모름
-            </label>
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <label class="text-xs text-gray-500 block mb-1">성별</label>
-          <div class="flex gap-3">
-            <button onclick="setGender('male')" id="btn-male"
-              class="flex-1 py-2 rounded-xl border border-violet-200 text-sm transition-colors">남성</button>
-            <button onclick="setGender('female')" id="btn-female"
-              class="flex-1 py-2 rounded-xl border border-violet-200 text-sm transition-colors">여성</button>
-          </div>
-        </div>
-
-        <button id="btn-calc" onclick="calculate()" disabled
-          class="btn-primary w-full text-white">
-          사주 계산하기 →
-        </button>
-      </div>
+    <div class="step-tab inactive" id="step2-tab">
+      <div style="font-size:16px;font-weight:800;margin-bottom:1px;">2</div>
+      <div style="font-size:10px;">사주풀이</div>
     </div>
-
-    <!-- 결과 -->
-    <div id="result-section" class="hidden space-y-4 mt-4">
-      <div class="pillar-card p-5">
-        <h2 class="text-xs text-gray-500 tracking-widest mb-4">사주 원국 (四柱)</h2>
-        <div class="grid grid-cols-4 gap-2" id="pillars-grid"></div>
-      </div>
-
-      <div class="pillar-card p-5">
-        <h2 class="text-xs text-gray-500 tracking-widest mb-4">오행 분포 (五行)</h2>
-        <div id="ohaeng-bars" class="space-y-3"></div>
-        <div id="lacking-box" class="mt-4 hidden">
-          <p class="text-xs text-gray-500 mb-2">부족한 오행</p>
-          <div id="lacking-list" class="flex gap-2 flex-wrap"></div>
-        </div>
-      </div>
-
-      <div class="pillar-card p-5">
-        <h2 class="text-xs text-gray-500 tracking-widest mb-3">간단 해석</h2>
-        <p id="ilgan-desc" class="text-sm text-gray-600 leading-relaxed"></p>
-      </div>
-
-      <button onclick="reset()"
-        class="w-full py-3 text-sm text-gray-500 border border-violet-200 rounded-xl hover:border-purple-500 hover:text-purple-700 transition-colors">
-        ← 다시 입력
-      </button>
-
-      <div class="text-center py-2">
-        <a href="https://taehyun1121.github.io/saju-tarot-site/" target="_blank"
-           class="text-purple-700 text-sm">타로 해석 + AI 사주풀이 → 프로 버전에서 보기</a>
-      </div>
+    <div class="step-tab inactive" id="step3-tab">
+      <div style="font-size:16px;font-weight:800;margin-bottom:1px;">3</div>
+      <div style="font-size:10px;">다시보기</div>
     </div>
   </div>
 
-  <script src="saju.js"></script>
-  <script>
-    // 셀렉트 초기화
-    const yearSel   = document.getElementById('sel-year');
-    const monthSel  = document.getElementById('sel-month');
-    const daySel    = document.getElementById('sel-day');
-    const hourSel   = document.getElementById('sel-hour');
-    const minuteSel = document.getElementById('sel-minute');
+  <!-- ── STEP 1: 정보 입력 ── -->
+  <div id="step1">
+    <div class="divider-label">기본 정보</div>
+    <div class="card">
+      <div style="margin-bottom:14px;">
+        <label style="font-size:12px;color:var(--text-sub);display:block;margin-bottom:6px;">이름 / 닉네임</label>
+        <input id="inp-name" class="input-f" placeholder="이름을 입력하세요" />
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text-sub);display:block;margin-bottom:6px;">성별</label>
+        <div style="display:flex;gap:8px;">
+          <button class="gender-btn" id="btn-male" onclick="setGender('male')">남성</button>
+          <button class="gender-btn" id="btn-female" onclick="setGender('female')">여성</button>
+        </div>
+      </div>
+    </div>
 
-    for (let y = 2010; y >= 1920; y--) {
-      const o = document.createElement('option'); o.value = y; o.textContent = `${y}년`;
-      yearSel.appendChild(o);
-    }
-    for (let m = 1; m <= 12; m++) {
-      const o = document.createElement('option'); o.value = m; o.textContent = `${m}월`;
-      monthSel.appendChild(o);
-    }
-    for (let d = 1; d <= 31; d++) {
-      const o = document.createElement('option'); o.value = d; o.textContent = `${d}일`;
-      daySel.appendChild(o);
-    }
-    for (let h = 0; h <= 23; h++) {
-      const o = document.createElement('option'); o.value = h; o.textContent = `${h}시`;
-      hourSel.appendChild(o);
-    }
-    for (let i = 0; i < 12; i++) {
-      const min = i * 5;
-      const o = document.createElement('option'); o.value = min; o.textContent = `${String(min).padStart(2,'0')}분`;
-      minuteSel.appendChild(o);
-    }
+    <div class="divider-label">생년월일 · 시간</div>
+    <div class="card">
+      <div style="margin-bottom:14px;">
+        <label style="font-size:12px;color:var(--text-sub);display:block;margin-bottom:6px;">생년월일</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <select id="sel-year" class="input-f"><option value="">년도</option></select>
+          <select id="sel-month" class="input-f"><option value="">월</option></select>
+          <select id="sel-day" class="input-f"><option value="">일</option></select>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <label style="font-size:12px;color:var(--text-sub);">태어난 시간</label>
+          <label style="font-size:11px;color:var(--focus);display:flex;align-items:center;gap:4px;cursor:pointer;">
+            <input type="checkbox" id="hour-unknown" style="accent-color:var(--focus);"/> 시간 모름
+          </label>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <select id="sel-hour" class="input-f"><option value="">시</option></select>
+          <select id="sel-minute" class="input-f"><option value="">분</option></select>
+        </div>
+      </div>
+    </div>
 
-    let gender = null;
-    function setGender(g) {
-      gender = g;
-      document.getElementById('btn-male').className =
-        'flex-1 py-2 rounded-xl border text-sm transition-colors ' +
-        (g === 'male' ? 'border-purple-500 text-purple-700 bg-purple-100' : 'border-violet-200 text-gray-400');
-      document.getElementById('btn-female').className =
-        'flex-1 py-2 rounded-xl border text-sm transition-colors ' +
-        (g === 'female' ? 'border-purple-500 text-purple-700 bg-purple-100' : 'border-violet-200 text-gray-400');
-      validate();
-    }
+    <div id="step1-error" style="color:#9b3a1c;font-size:13px;text-align:center;margin-bottom:8px;display:none;"></div>
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button class="btn-sec" style="width:28%;" onclick="setHourUnknown()">시간 모름</button>
+      <button id="btn-calc" class="btn-cta" style="flex:1;" onclick="calculate()" disabled>🔮 사주풀이 시작</button>
+    </div>
+  </div>
 
-    document.getElementById('hour-unknown').addEventListener('change', function() {
-      hourSel.disabled = this.checked;
-      minuteSel.disabled = this.checked;
-      validate();
+  <!-- ── STEP 2: 결과 ── -->
+  <div id="step2" style="display:none;">
+    <div class="divider-label">사주 원국 (四柱)</div>
+    <div class="card">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;" id="pillars-grid"></div>
+    </div>
+
+    <div class="divider-label">오행 분포 (五行)</div>
+    <div class="card">
+      <div id="ohaeng-bars" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <div id="lacking-box" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--divider);display:none;">
+        <p style="font-size:11px;color:var(--text-sub);margin-bottom:8px;">부족한 오행</p>
+        <div id="lacking-list" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">보완이 필요한 기운이에요</p>
+      </div>
+      <div id="balanced-msg" style="font-size:13px;color:#5a8040;text-align:center;margin-top:12px;display:none;">✦ 오행이 균형 잡혀 있어요</div>
+    </div>
+
+    <div class="divider-label">일간 해석</div>
+    <div class="card">
+      <p id="ilgan-desc" style="font-size:14px;color:var(--text-sub);line-height:1.8;"></p>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button class="btn-sec" style="flex:1;" onclick="goStep(1)">← 다시 입력</button>
+      <a href="https://taehyun1121.github.io/saju-tarot-site/" target="_blank"
+         style="flex:1;display:block;">
+        <button class="btn-cta" style="width:100%;">🃏 타로 리딩</button>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script src="saju.js"></script>
+<script>
+  // 셀렉트 초기화
+  const yearSel = document.getElementById('sel-year');
+  const monthSel = document.getElementById('sel-month');
+  const daySel = document.getElementById('sel-day');
+  const hourSel = document.getElementById('sel-hour');
+  const minuteSel = document.getElementById('sel-minute');
+
+  for (let y = 2010; y >= 1920; y--) {
+    const o = document.createElement('option'); o.value = y; o.textContent = `${y}년`; yearSel.appendChild(o);
+  }
+  for (let m = 1; m <= 12; m++) {
+    const o = document.createElement('option'); o.value = m; o.textContent = `${m}월`; monthSel.appendChild(o);
+  }
+  for (let d = 1; d <= 31; d++) {
+    const o = document.createElement('option'); o.value = d; o.textContent = `${d}일`; daySel.appendChild(o);
+  }
+  for (let h = 0; h <= 23; h++) {
+    const o = document.createElement('option'); o.value = h; o.textContent = `${h}시`; hourSel.appendChild(o);
+  }
+  for (let i = 0; i < 12; i++) {
+    const min = i * 5;
+    const o = document.createElement('option'); o.value = min; o.textContent = `${String(min).padStart(2,'0')}분`;
+    minuteSel.appendChild(o);
+  }
+
+  let gender = null;
+
+  function setGender(g) {
+    gender = g;
+    document.getElementById('btn-male').className = 'gender-btn' + (g === 'male' ? ' on' : '');
+    document.getElementById('btn-female').className = 'gender-btn' + (g === 'female' ? ' on' : '');
+    validate();
+  }
+
+  function setHourUnknown() {
+    document.getElementById('hour-unknown').checked = true;
+    hourSel.disabled = true; minuteSel.disabled = true;
+    hourSel.value = ''; minuteSel.value = '';
+    validate();
+  }
+
+  document.getElementById('hour-unknown').addEventListener('change', function() {
+    hourSel.disabled = this.checked;
+    minuteSel.disabled = this.checked;
+    if (this.checked) { hourSel.value = ''; minuteSel.value = ''; }
+    validate();
+  });
+
+  ['sel-year','sel-month','sel-day','sel-hour','inp-name'].forEach(id => {
+    document.getElementById(id).addEventListener('input', validate);
+    document.getElementById(id).addEventListener('change', validate);
+  });
+
+  function validate() {
+    const y = yearSel.value, m = monthSel.value, d = daySel.value;
+    const hourOk = document.getElementById('hour-unknown').checked || hourSel.value !== '';
+    document.getElementById('btn-calc').disabled = !(y && m && d && gender && hourOk);
+  }
+
+  function goStep(n) {
+    document.getElementById('step1').style.display = n === 1 ? '' : 'none';
+    document.getElementById('step2').style.display = n === 2 ? '' : 'none';
+    ['step1-tab','step2-tab','step3-tab'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      el.className = 'step-tab ' + (i + 1 === n ? 'active' : 'inactive');
+    });
+    window.scrollTo(0, 0);
+  }
+
+  function calculate() {
+    const year = +yearSel.value, month = +monthSel.value, day = +daySel.value;
+    const hourUnknown = document.getElementById('hour-unknown').checked;
+    const hour = hourUnknown ? null : +hourSel.value;
+
+    const result = calcAllPillars(year, month, day, hour);
+
+    // 4주 기둥
+    const OH_COLOR = {'木':'#4ade80','火':'#ef4444','土':'#f59e0b','金':'#94a3b8','水':'#60a5fa'};
+    const labels = ['년주','월주','일주','시주'];
+    const keys = ['yeonju','wolju','ilju','siju'];
+    const grid = document.getElementById('pillars-grid');
+    grid.innerHTML = '';
+    keys.forEach((k, i) => {
+      const p = result.pillars[k];
+      const top = p ? p.gan : '-';
+      const bot = p ? p.ji : (k === 'siju' ? '모름' : '-');
+      grid.innerHTML += `
+        <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:12px;
+                    padding:12px 6px;text-align:center;">
+          <div style="font-size:10px;color:var(--text-sub);margin-bottom:8px;">${labels[i]}</div>
+          <div class="pillar-top">${top}</div>
+          <div style="width:100%;height:1px;background:var(--border);margin:6px 0;"></div>
+          <div class="pillar-bot">${bot}</div>
+        </div>`;
     });
 
-    ['sel-year','sel-month','sel-day','sel-hour'].forEach(id => {
-      document.getElementById(id).addEventListener('change', validate);
+    // 오행 바
+    const OH_NAME = {'木':'목','火':'화','土':'토','金':'금','水':'수'};
+    const ohaeng = result.ohaeng;
+    const total = ohaeng.total || 1;
+    const bars = document.getElementById('ohaeng-bars');
+    bars.innerHTML = '';
+    ['木','火','土','金','水'].forEach(oh => {
+      const cnt = ohaeng.counts[oh] || 0;
+      const pct = Math.round(cnt / total * 100);
+      bars.innerHTML += `
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:14px;font-weight:700;width:22px;text-align:center;color:${OH_COLOR[oh]}">${OH_NAME[oh]}</span>
+          <div class="oh-bar" style="flex:1;"><div class="oh-fill" style="width:${pct}%;background:${OH_COLOR[oh]};"></div></div>
+          <span style="font-size:12px;color:var(--text-sub);width:14px;text-align:right;">${cnt}</span>
+        </div>`;
     });
 
-    function validate() {
-      const y = yearSel.value, m = monthSel.value, d = daySel.value;
-      const hourOk = document.getElementById('hour-unknown').checked || hourSel.value !== '';
-      document.getElementById('btn-calc').disabled = !(y && m && d && gender && hourOk);
+    // 부족한 오행
+    if (ohaeng.lacking.length > 0) {
+      document.getElementById('lacking-box').style.display = '';
+      document.getElementById('lacking-list').innerHTML = ohaeng.lacking.map(oh =>
+        `<span style="padding:4px 12px;border-radius:20px;border:1px solid ${OH_COLOR[oh]};
+                      font-size:13px;font-weight:700;color:${OH_COLOR[oh]}">${oh}</span>`
+      ).join('');
+      document.getElementById('balanced-msg').style.display = 'none';
+    } else {
+      document.getElementById('lacking-box').style.display = 'none';
+      document.getElementById('balanced-msg').style.display = '';
     }
 
-    function calculate() {
-      const year = +yearSel.value, month = +monthSel.value, day = +daySel.value;
-      const hourUnknown = document.getElementById('hour-unknown').checked;
-      const hour   = hourUnknown ? null : +hourSel.value;
-      const minute = hourUnknown ? null : (minuteSel.value !== '' ? +minuteSel.value : 0);
+    // 일간 해석
+    document.getElementById('ilgan-desc').textContent = ILGAN_DESC[result.pillars.ilju?.gan] || '';
 
-      const result = calcAllPillars(year, month, day, hour);
-
-      // 기둥 렌더
-      const labels = ['년주','월주','일주','시주'];
-      const keys = ['yeonju','wolju','ilju','siju'];
-      const grid = document.getElementById('pillars-grid');
-      grid.innerHTML = '';
-      keys.forEach((k, i) => {
-        const p = result.pillars[k];
-        const top = p ? p.gan : '-';
-        const bot = p ? p.ji : (k === 'siju' ? '시간 모름' : '-');
-        grid.innerHTML += `
-          <div class="pillar-card p-3 text-center">
-            <div class="text-xs text-gray-500 mb-2">${labels[i]}</div>
-            <div class="text-2xl font-bold text-purple-700 mb-1">${top}</div>
-            <div class="w-full border-t border-violet-200 mb-1"></div>
-            <div class="text-xl font-semibold text-purple-300">${bot}</div>
-          </div>`;
-      });
-
-      // 오행 바
-      const OH_COLOR = {'木':'#4ade80','火':'#f87171','土':'#fbbf24','金':'#c0c8d4','水':'#60a5fa'};
-      const OH_NAME  = {'木':'목','火':'화','土':'토','金':'금','水':'수'};
-      const ohaeng = result.ohaeng;
-      const total = Object.values(ohaeng.counts).reduce((a,b)=>a+b,0) || 1;
-      const bars = document.getElementById('ohaeng-bars');
-      bars.innerHTML = '';
-      ['木','火','土','金','水'].forEach(oh => {
-        const cnt = ohaeng.counts[oh] || 0;
-        const pct = Math.round(cnt/total*100);
-        bars.innerHTML += `
-          <div class="flex items-center gap-3">
-            <span class="text-sm font-bold w-6 text-center" style="color:${OH_COLOR[oh]}">${OH_NAME[oh]}</span>
-            <div class="oh-bar flex-1"><div class="oh-fill" style="width:${pct}%;background:${OH_COLOR[oh]}"></div></div>
-            <span class="text-xs text-gray-400 w-4 text-right">${cnt}</span>
-          </div>`;
-      });
-
-      // 부족한 오행
-      const lackBox = document.getElementById('lacking-box');
-      const lackList = document.getElementById('lacking-list');
-      if (ohaeng.lacking.length > 0) {
-        lackBox.classList.remove('hidden');
-        lackList.innerHTML = ohaeng.lacking.map(oh =>
-          `<span class="px-3 py-1 rounded-full text-xs font-bold border" style="color:${OH_COLOR[oh]};border-color:${OH_COLOR[oh]}">${oh}</span>`
-        ).join('');
-      } else {
-        lackBox.classList.add('hidden');
-      }
-
-      // 일간 해석
-      const desc = ILGAN_DESC[result.pillars.ilju?.gan] || '일간 정보를 확인하세요.';
-      document.getElementById('ilgan-desc').textContent = desc;
-
-      document.getElementById('form-section').classList.add('hidden');
-      document.getElementById('result-section').classList.remove('hidden');
-    }
-
-    function reset() {
-      document.getElementById('form-section').classList.remove('hidden');
-      document.getElementById('result-section').classList.add('hidden');
-    }
-  </script>
+    goStep(2);
+  }
+</script>
 </body>
 </html>
