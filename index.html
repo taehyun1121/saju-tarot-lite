@@ -62,9 +62,12 @@
 
         <div class="mb-4">
           <label class="text-xs text-gray-500 block mb-1">태어난 시간 (모르면 체크)</label>
-          <div class="flex gap-3 items-center">
+          <div class="flex gap-2 items-center">
             <select id="sel-hour" class="input-field flex-1">
-              <option value="">시간 선택</option>
+              <option value="">시</option>
+            </select>
+            <select id="sel-minute" class="input-field flex-1">
+              <option value="">분</option>
             </select>
             <label class="flex items-center gap-2 text-sm text-gray-400 whitespace-nowrap cursor-pointer">
               <input type="checkbox" id="hour-unknown" class="accent-purple-500" />
@@ -126,10 +129,11 @@
   <script src="saju.js"></script>
   <script>
     // 셀렉트 초기화
-    const yearSel = document.getElementById('sel-year');
-    const monthSel = document.getElementById('sel-month');
-    const daySel = document.getElementById('sel-day');
-    const hourSel = document.getElementById('sel-hour');
+    const yearSel   = document.getElementById('sel-year');
+    const monthSel  = document.getElementById('sel-month');
+    const daySel    = document.getElementById('sel-day');
+    const hourSel   = document.getElementById('sel-hour');
+    const minuteSel = document.getElementById('sel-minute');
 
     for (let y = 2010; y >= 1920; y--) {
       const o = document.createElement('option'); o.value = y; o.textContent = `${y}년`;
@@ -147,6 +151,11 @@
       const o = document.createElement('option'); o.value = h; o.textContent = `${h}시`;
       hourSel.appendChild(o);
     }
+    for (let i = 0; i < 12; i++) {
+      const min = i * 5;
+      const o = document.createElement('option'); o.value = min; o.textContent = `${String(min).padStart(2,'0')}분`;
+      minuteSel.appendChild(o);
+    }
 
     let gender = null;
     function setGender(g) {
@@ -162,6 +171,7 @@
 
     document.getElementById('hour-unknown').addEventListener('change', function() {
       hourSel.disabled = this.checked;
+      minuteSel.disabled = this.checked;
       validate();
     });
 
@@ -178,7 +188,8 @@
     function calculate() {
       const year = +yearSel.value, month = +monthSel.value, day = +daySel.value;
       const hourUnknown = document.getElementById('hour-unknown').checked;
-      const hour = hourUnknown ? null : +hourSel.value;
+      const hour   = hourUnknown ? null : +hourSel.value;
+      const minute = hourUnknown ? null : (minuteSel.value !== '' ? +minuteSel.value : 0);
 
       const result = calcAllPillars(year, month, day, hour);
 
